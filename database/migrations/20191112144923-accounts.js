@@ -25,18 +25,12 @@ module.exports = {
          type: Sequelize.STRING
        },
        birthday: {
-         type: Sequelize.STRING
+         type: Sequelize.DATE
        }
      });
   },
 
   down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.dropTable('users');
-    */
+    return queryInterface.dropTable('accounts');
   }
 };
