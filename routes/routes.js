@@ -3,19 +3,19 @@ const express = require('express'),
       Account = require('../core/account');
       
 
-Router.post("/event", function(req, res){
+Router.post("/account/event/", function(req, res){
     switch(req.query.event) {
         case "login":
-            var login = view(req.query.event, req.body);
+            var login = Account.view(req.query.event, req.body);
             res.send(login);
             break;
             
         case "register":
-            var count = view("check", req.body);
+            var count = Account.view("check", req.body);
             if (count > 0) {
                 res.send('Email is already registered');
             } else {
-                var add_reg = add("add_account", req.body);
+                var add_reg = Account.add("add_account", req.body);
                 res.send(add_reg); 
             }
             break;
