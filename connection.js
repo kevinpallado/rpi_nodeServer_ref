@@ -1,11 +1,12 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
+const conn = require('./database/config/config.json');
 
 var mysqlConnection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'npmcrud',
-    multipleStatements: true
+    host: '192.168.10.10',
+    user: conn.development.username,
+    password: conn.development.password,
+    database: conn.development.database,
+    multipleStatements: true,
 });
 
 mysqlConnection.connect((err)=>{
@@ -19,4 +20,4 @@ mysqlConnection.connect((err)=>{
     }
 });
 
-module.export = mysqlConnection;
+module.exports = mysqlConnection;
