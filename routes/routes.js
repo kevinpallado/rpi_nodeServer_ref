@@ -1,6 +1,7 @@
 const express = require('express'),
       Router = express.Router(),
-      Account = require('../core/account');
+      Account = require('../core/account'),
+      Device = require('../core/device');
       
 
 Router.post("/account/event/", function(req, res){
@@ -24,4 +25,10 @@ Router.post("/account/event/", function(req, res){
             break;
     }
 });
+
+Router.post("/devices/event/", async(req, res) => {
+    var num = await Device._view(req.query.event, req.body);
+    res.send({ data: num });
+});
+
 module.exports = Router;
