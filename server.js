@@ -4,35 +4,63 @@ const express = require('express'),
     routes = require('./routes/routes'),
     crypto = require('crypto'),
     static = require('node-static'),
+    request = require('request'),
+    path = require('path'),
     file = new static.Server('./'),
-    app = express(),
-    port = 3210;
+    app = express();
 
-app.listen(3000);
-
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+const server = http.createServer(app);
+
+require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+    console.log('addr: ' + add);
+});
+const WebSocket = require('ws');
+const s = new WebSocket.Server({ server: server, path: "/echo", noServer: true});
 app.use('/automation', routes);
-
-const server = http.createServer((req, res) => {
-    req.addListener('end', () => file.serve(req, res)).resume();
-  });
-
-server.listen(port, () => {
-    console.log(`Websocket Server running at http://localhost:${port}`);
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname + '/index.html'));
 });
 
-server.on('upgrade', function(req, socket) {
-    if(req.headers['upgrade'] !== 'websocket') {
-        socket.end('HTTP/1.1 400 Bad Request');
-        return;
-    }
+s.on('connection', function (ws, req) {
+
+    /******* when server receives messsage from client trigger function with argument message *****/
+    ws.on('message', function (message) {
+        try {
+            console.log("Got json data => " + JSON.parse(message));
+            ws.send("Got json data => " + JSON.stringify(message));
+        }
+
+        catch(e)
+        {
+            console.log("Message is not json or empty");
+            var data = {
+                "registered" : false
+            }
+            ws.send(JSON.stringify(data));
+        }
+        ;
+         //send to client where message is from
+        // s.clients.forEach(function (client) { //broadcast incoming message to all clients (s.clients)
+        //     if (client != ws && client.readyState) { //except to the same client (ws) that sent this message
+        //         client.send("broadcast: " + message);
+        //         console.log("successfully broadcast");
+        //         startingChar = false;
+        //     }
+        //     else
+        //     {
+        //         console.log(client.readyState + "  " + WebSocket.OPEN);
+        //     }
+        // });
+        
+    });
+    ws.on('close', function () {
+        console.log("lost one client");
+    });
+    
+    console.log("new client connected");
 });
 
-function generateAcceptValue (acceptKey) 
-{
-    return crypto
-    .createHash('sha1')
-    .update(acceptKey + '258EAFA5-E914–47DA-95CA-C5AB0DC85B11', 'binary')
-    .digest('base64');
-}
+server.listen(3000);

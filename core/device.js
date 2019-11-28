@@ -3,15 +3,19 @@ const db = require('../connection');
 function _view(event,data)
     {
         return new Promise(function(resolve,reject) {
-            console.log(event + " " +data.macAddress+ " ");
             var macaddr = data.macAddress;
             switch(event){
                 case "check":
                     var sql_search = "SELECT * FROM registered_devices WHERE macAddress = '" + data.macAddress + "'";
                     db.query(sql_search, (err, rows, results) => {
-                        // console.log(rows.length)
-                        resolve(rows.length);
+                        console.log(Object.entries(rows).length);
+                        if(err == null)
+                        {
+                            resolve(Object.entries(rows).length == 0 ? 0 : rows.length);
+                        }
+                        
                     });
+                    break;
                 case "add-unregister-devices":
                     var sql_add = "INSERT INTO unregistered_devices (macAddress) VALUES ('" + macaddr + "')";
                     var sql_check = "SELECT * FROM unregistered_devices WHERE macAddress = '" + macaddr + "'";
@@ -30,6 +34,7 @@ function _view(event,data)
                             resolve(rows.length)
                         }
                     });
+                    break;
                 case "register-devices":
                     var sql_retreive = "SELECT * FROM unregistered_devices WHERE macAddress = '" + macaddr + "'";
                     var sql_remove = "DELETE FROM unregistered_devices WHERE macAddress = '" + macaddr + "'";
@@ -49,7 +54,6 @@ function _view(event,data)
         });
         
     }
-
     module.exports = {
         _view : _view
     }
