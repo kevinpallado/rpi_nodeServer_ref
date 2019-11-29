@@ -21,6 +21,9 @@ module.exports = {
     macAddress: {
       type: Sequelize.STRING
     },
+    state: {
+      type: Sequelize.BOOLEAN
+    },
     accountID: {
       type: Sequelize.INTEGER,
       references: {
@@ -29,13 +32,6 @@ module.exports = {
       },
       onDelete: 'cascade'
     },
-    stateID: {
-      type: Sequelize.INTEGER,
-      references: {
-        model: 'device_state',
-        key: '_id'
-      }
-    }
    });
   },
 
