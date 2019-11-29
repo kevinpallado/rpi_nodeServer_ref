@@ -27,9 +27,13 @@ Router.post("/account/event/", async (req, res) => {
 });
 
 Router.post("/devices/event/", async(req, res) => {
-    console.log("receive requests");
+    var _response = [];
     var num = await Device._view(req.query.event, req.body);
-    res.send(JSON.stringify({ data: num }));
+    Object.values(num).forEach(val => {
+        _response.push(val);
+    });
+    console.log(JSON.stringify({ reg: _response[0], unreg: _response[1] }));
+    res.send(JSON.stringify({ reg: _response[0], unreg: _response[1] }));
 });
 
 module.exports = Router;
