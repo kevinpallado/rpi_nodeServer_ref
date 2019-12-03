@@ -1,5 +1,5 @@
 <html lang="en">
-
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <head>
     <meta charset="utf-8" />
 
@@ -14,10 +14,10 @@
     <button onclick="clearlog()">Clear Logs</button>
 
     <div style="overflow:scroll; width: 800px; height: 550px; border: solid; border-radius: 9px" id="display"></div>
-
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
     <script>
         //var sock =new WebSocket("ws://localhost:5001");
-        var sock = new WebSocket("ws://192.168.1.2:3000/echo");  //replace this address with the one the node.js server prints out. keep port 3000
+        var sock = new WebSocket("ws://192.168.1.12:3000/echo");  //replace this address with the one the node.js server prints out. keep port 3000
         var display = document.getElementById("display")
 
         sock.onopen = function (event) {
@@ -27,9 +27,9 @@
 
         };
         sock.onmessage = function (event) {
-            console.log(event.data);//show received from server data in console of browser
+            console.log("ON MESSAGE => " + event.data);//show received from server data in console of browser
             display.innerHTML += event.data + "<br />"; //add incoming message from server to the log screen previous string + new string(message)
-
+            google.charts.setOnLoadCallback(this.drawChart);
         }
 
         function myFunction(event) {
@@ -51,6 +51,29 @@
         function clearlog() {
             display.innerHTML = "";
         }
+
+        google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales'],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030]
+        ]);
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
     </script>
 </body>
 

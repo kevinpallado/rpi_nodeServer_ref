@@ -12,11 +12,20 @@ function view(event, data) {
             case "login":
                 var sql_login = "SELECT * FROM accounts WHERE firstName = '" + data.firstname + "' AND password = '" + data.password + "'";
                 db.query(sql_login, (err, rows, results) => {
+                    console.log(err + " = " + JSON.stringify(rows));
                     if (err) {
                         reject(err);
                     }
                     else {
-                        resolve(rows);
+                        if(rows.length > 0)
+                        {
+                            console.log(rows);
+                            resolve(rows);
+                        }
+                        else
+                        {
+                            resolve(rows);
+                        }
                     }
                 })
             default:

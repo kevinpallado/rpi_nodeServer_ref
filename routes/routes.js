@@ -7,6 +7,7 @@ const express = require('express'),
 Router.post("/account/event/", async (req, res) => {
     switch(req.query.event) {
         case "login":
+            console.log(JSON.stringify(req.body) + " => " + req.query.event);
             var login = await Account.view(req.query.event, req.body);
             res.send(login);
             break;
@@ -30,7 +31,14 @@ Router.post("/account/event/", async (req, res) => {
 
 Router.post("/devices/event/", async(req, res) => {
     var _response = [];
-    var num = await Device._view(req.query.event, req.body);
+    if(req.query.event == "add")
+    {
+        var num = await Device.add(req.query.method, req.body);
+    }
+    else if(req.query.event == "index")
+    {
+        var num = await Device._view(req.query.event, req.body);
+    }
     Object.values(num).forEach(val => {
         _response.push(val);
     });
