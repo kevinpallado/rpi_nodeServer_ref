@@ -6,6 +6,7 @@ const express = require('express'),
     static = require('node-static'),
     request = require('request'),
     path = require('path'),
+    cron = require('node-cron'),
     file = new static.Server('./'),
     app = express();
 
@@ -63,4 +64,19 @@ s.on('connection', function (ws, req) {
     console.log("new client connected");
 });
 
+
+cron.schedule('*/10 * * * * *', () => {
+    var sock = new WebSocket("ws://192.168.1.14:3000/echo");
+    console.log('running a task every minute');
+    
+    var data = {
+        "node" : true,
+        "fuck" : "you"
+    };
+    setTimeout(function () { sock.send(JSON.stringify(data)); }, 1000);
+
+    sock.onmessage = function (event) {
+        console.log(event.data);//show received from server data in console of browser
+    }
+});
 server.listen(3000);

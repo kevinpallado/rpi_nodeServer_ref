@@ -12,12 +12,14 @@ Router.post("/account/event/", async (req, res) => {
             break;
             
         case "register":
+            console.log(JSON.stringify(req.body));
+            console.log(req.body);
             var count = await Account.view("check", req.body);
             if (count > 0) {
-                res.send('Email is already registered');
+                res.send(JSON.stringify({'result': 'Email is already registered'}));
             } else {
                 var add_reg = await Account.add("add_account", req.body);
-                res.send(add_reg); 
+                res.send(JSON.stringify({ 'result' : add_reg})); 
             }
             break;
         

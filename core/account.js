@@ -29,7 +29,7 @@ function add(event, data) {
     return new Promise((resolve, reject) => {
         switch (event) {
             case "add_account":
-                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday) VALUES ('" + data.firstname + "','" + data.lastname + "','" + data.email + "','" + data.contactnumber + "','" + data.password + "','" + data.birthday + "')";
+                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "')";
                 db.query(sql_add, (err, rows, results) => {
                     if (!err) {
                         resolve(results);
