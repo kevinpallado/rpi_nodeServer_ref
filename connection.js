@@ -9,6 +9,14 @@ var mysqlConnection = mysql.createConnection({
     multipleStatements: true,
 });
 
+var mysqlPool  = mysql.createPool({
+    connectionLimit : 3,
+    host: conn.development.host,
+    user: conn.development.username,
+    password: conn.development.password,
+    database: conn.development.database
+  });
+
 mysqlConnection.connect((err)=>{
     if(!err)
     {
@@ -20,4 +28,4 @@ mysqlConnection.connect((err)=>{
     }
 });
 
-module.exports = mysqlConnection;
+module.exports = { pool : mysqlPool, sql : mysqlConnection};

@@ -1,26 +1,25 @@
 const express = require('express'),
       Router = express.Router(),
       Account = require('../core/account'),
+      Consumption = require('../core/consumption');
       Device = require('../core/device');
       
+var emon_timer;
 
 Router.post("/account/event/", async (req, res) => {
     switch(req.query.event) {
         case "login":
-            console.log(JSON.stringify(req.body) + " => " + req.query.event);
             var login = await Account.view(req.query.event, req.body);
             res.send(login);
             break;
             
         case "register":
-            console.log(JSON.stringify(req.body));
-            console.log(req.body);
             var count = await Account.view("check", req.body);
             if (count > 0) {
-                res.send(JSON.stringify({'result': 'Email is already registered'}));
+                res.send(JSON.stringify({'result': 'Email is already registered', 'error': true}));
             } else {
                 var add_reg = await Account.add("add_account", req.body);
-                res.send(JSON.stringify({ 'result' : add_reg})); 
+                res.send(JSON.stringify({'result' : 'Successfully registered', 'error': false})); 
             }
             break;
         
@@ -29,21 +28,44 @@ Router.post("/account/event/", async (req, res) => {
     }
 });
 
-Router.post("/devices/event/", async(req, res) => {
-    var _response = [];
-    if(req.query.event == "add")
+Router.post("/devices/event", async(req, res) => {
+    var response;
+    switch(req.query.event)
     {
-        var num = await Device.add(req.query.method, req.body);
+        case "view":
+            response = await Device.view(req.query.method, req.body);
+            if(req.query.method === "check")
+            {
+                res.send(JSON.stringify(response[0]));
+            }
+            else
+            {
+                res.send(JSON.stringify(response));
+            }
+            break;
+        
+        case "update":
+            response = await Device.update(req.query.method, req.body);
+            !response.error && req.body.state == 1 ? emon_timer = true : emon_timer = false;
+            res.send(JSON.stringify(response));
+        default:
+            break;
     }
-    else if(req.query.event == "index")
-    {
-        var num = await Device._view(req.query.event, req.body);
-    }
-    Object.values(num).forEach(val => {
-        _response.push(val);
-    });
-    console.log(JSON.stringify({ reg: _response[0], unreg: _response[1] }));
-    res.send(JSON.stringify({ reg: _response[0], unreg: _response[1] }));
+    console.log("emon timer => " + emon_timer);
 });
 
-module.exports = Router;
+Router.post("/devices/consumption/event", async function(req, res) {
+    switch(req.query.event)
+    {
+        case "add":
+            response = await Consumption.add(req.query.method, req.body);
+            res.send(JSON.stringify(response));
+        default:
+            break;
+    }
+});
+
+module.exports = {
+    Router: Router,
+    emon_timer : emon_timer
+};
