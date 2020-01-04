@@ -5,7 +5,9 @@ module.exports = {
    return queryInterface.createTable('consumptions',
    {
     _id: {
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     voltage: {
       type: Sequelize.STRING

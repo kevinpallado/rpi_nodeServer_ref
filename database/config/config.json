@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "homestead",
-    "password": "secret",
+    "username": "root",
+    "password": "",
     "database": "automation",
     "host": "localhost",
     "dialect": "mysql",
