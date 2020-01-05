@@ -34,6 +34,7 @@ function view(event, data) {
                                     if (err) throw error;
                                     if (rows.length == 0) // if mac is not exists means it is already registered
                                     {
+                                        dataResponse.init_setup = false;
                                         dataResponse.register = 1;
                                         resolve(dataResponse);
                                     }

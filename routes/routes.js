@@ -36,6 +36,7 @@ Router.post("/devices/event", async(req, res) => {
             response = await Device.view(req.query.method, req.body);
             if(req.query.method === "check")
             {
+                console.log("CHECK! => " + JSON.stringify(response[0]));
                 res.send(JSON.stringify(response[0]));
             }
             else
