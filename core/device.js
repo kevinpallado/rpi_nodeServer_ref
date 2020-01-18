@@ -114,6 +114,12 @@ function view(event, data) {
                     }
                 });
                 break;
+            case "view-unregistered-device":
+                console.log("Hello unregistered");
+                var sql_unregistered = "SELECT * FROM unregistered_devices";
+                db.query(sql_unregistered, (err, rows, results) => {
+                    if (err) {reject(err);}
+                    else {resolve(rows);}});
 
             case "registered-devices":
                 var sql_designation = "SELECT rd._id, rd.application, rd.deviceLists, rd.area, rd.macAddress, rd.state, acc.firstName, acc.lastName FROM registered_devices as rd LEFT JOIN accounts as acc ON rd.accountID = acc._id WHERE acc._id = '" + data.accountid + "'";
@@ -141,6 +147,97 @@ function view(event, data) {
         }
     });
 
+}
+
+function add(event, data) {
+    return new Promise((resolve, reject) => {
+
+        switch (event) {
+            case "register-devices":
+                console.log("control->:adding");
+                var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 1 + "','" + data.accountID + "')";
+                db.query(sql_register_device, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(results);
+                    }
+                });
+                break;
+
+            case "view-registered-device":
+                console.log(data.type);
+                var sql_view = "SELECT *,registered_devices._id as registered_devices_id from accounts,registered_devices " +
+                    "where accounts._id = registered_devices.accountID AND accounts._id = '" + data.accountID + "'" +
+                    "AND application = '" + data.type + "'";
+                console.log(sql_view);
+                db.query(sql_view, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
+                    }
+                });
+                break;
+
+            case "toogle-device":
+                var new_device_status = '';
+                data.status == 0 ? new_device_status = 1 : new_device_status = 0;
+                var sql_toogle = "UPDATE registered_devices SET status = '" + new_device_status + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
+                db.query(sql_toogle, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(results);
+                    }
+                });
+                break;
+            case "door-toogle-device":
+                var new_device_status = '';
+                console.log("Hello");
+                data.status == 0 ? new_device_status = 1 : new_device_status = 0;
+                var sql_toogle = "UPDATE registered_devices SET status = '" + new_device_status + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
+                db.query(sql_toogle, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        if (new_device_status == 1) {
+                            //toogle(new_device_status, data);
+                            setTimeout(function () {
+                                var sql_toogle = "UPDATE registered_devices SET status = '" + 0 + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
+                                db.query(sql_toogle, (err, rows, results) => {
+                                    if (err) {
+                                        reject(err);
+                                    }
+                                    else {
+                                        resolve(results);
+                                    }
+                                });
+                            }, 9000);
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                });
+                break;
+            case "modal-appliances":
+                var sql_modal_appliances = "SELECT * from registered_devices where _id ='" + data.device_id + "'";
+                db.query(sql_modal_appliances, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
+                    }
+                });
+            default:
+                break;
+        }
+    });
 }
 
 function update(event, data)
@@ -186,4 +283,5 @@ function update(event, data)
 module.exports = {
     view: view,
     update: update,
+    adding: add
 }

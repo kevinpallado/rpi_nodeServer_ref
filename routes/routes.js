@@ -3,8 +3,6 @@ const express = require('express'),
       Account = require('../core/account'),
       Consumption = require('../core/consumption');
       Device = require('../core/device');
-      
-var emon_timer;
 
 Router.post("/account/event/", async (req, res) => {
     switch(req.query.event) {
@@ -49,10 +47,24 @@ Router.post("/devices/event", async(req, res) => {
             response = await Device.update(req.query.method, req.body);
             !response.error && req.body.state == 1 ? emon_timer = true : emon_timer = false;
             res.send(JSON.stringify(response));
+
+        case "door-toogle-device":
+            var toogle = await Device.adding(req.body.event, req.body);
+            res.send(JSON.stringify({ 'result': toogle }));
+            break;
+
+        case "modal-appliances":
+            var modal_appliances = await Device.adding(req.body.event, req.body);
+            res.send(modal_appliances);
+            break;
+
+        case "view-unregistered-device":
+            var unregistered = await Device._view(req.body.event, req.body);
+            res.send(unregistered);
+
         default:
             break;
     }
-    console.log("emon timer => " + emon_timer);
 });
 
 Router.post("/devices/consumption/event", async function(req, res) {
@@ -67,6 +79,5 @@ Router.post("/devices/consumption/event", async function(req, res) {
 });
 
 module.exports = {
-    Router: Router,
-    emon_timer : emon_timer
+    Router: Router
 };
