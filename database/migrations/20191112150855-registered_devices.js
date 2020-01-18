@@ -24,6 +24,10 @@ module.exports = {
     state: {
       type: Sequelize.BOOLEAN
     },
+    password: {
+      type: Sequelize.STRING,
+      defaultValue: null
+    },
     accountID: {
       type: Sequelize.INTEGER,
       references: {
