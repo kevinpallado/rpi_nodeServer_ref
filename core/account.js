@@ -6,13 +6,13 @@ function view(event, data) {
         switch (event) {
             case "check":
                 var sql_search = "SELECT * FROM accounts WHERE email = '" + data.email + "' AND firstName = '" + data.firstName + "'";
-                db.query(sql_search, (err, rows, results) => {
+                db.sql.query(sql_search, (err, rows, results) => {
                     resolve(rows.length);
                 });
                 break;
             case "login":
                 var sql_login = "SELECT * FROM accounts WHERE firstName = '" + data.firstName + "' AND password = '" + data.password + "'";
-                db.query(sql_login, (err, rows, results) => {
+                db.sql.query(sql_login, (err, rows, results) => {
                     console.log(err + " = " + JSON.stringify(rows));
                     if (err) {
                         reject(err);
@@ -40,7 +40,7 @@ function add(event, data) {
         switch (event) {
             case "add_account":
                 var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "')";
-                db.query(sql_add, (err, rows, results) => {
+                db.sql.query(sql_add, (err, rows, results) => {
                     if (!err) {
                         resolve(results);
                     }
