@@ -2,15 +2,16 @@ const db = require('../connection');
 
 function view(event, data) {
     return new Promise((resolve, reject) => {
+        console.log("event => " + event);
         switch (event) {
             case "check":
-                var sql_search = "SELECT * FROM accounts WHERE email = '" + data.email + "' AND firstName = '" + data.firstname + "'";
+                var sql_search = "SELECT * FROM accounts WHERE email = '" + data.email + "' AND firstName = '" + data.firstName + "'";
                 db.query(sql_search, (err, rows, results) => {
                     resolve(rows.length);
                 });
                 break;
             case "login":
-                var sql_login = "SELECT * FROM accounts WHERE firstName = '" + data.firstname + "' AND password = '" + data.password + "'";
+                var sql_login = "SELECT * FROM accounts WHERE firstName = '" + data.firstName + "' AND password = '" + data.password + "'";
                 db.query(sql_login, (err, rows, results) => {
                     console.log(err + " = " + JSON.stringify(rows));
                     if (err) {
