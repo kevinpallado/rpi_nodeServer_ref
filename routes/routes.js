@@ -69,8 +69,8 @@ Router.post("/devices/event", async(req, res) => {
             res.send(unregistered);
             break;
         case "register-devices":
-            var unregistered = await Device.add(req.body.event, req.body);
-            res.send(unregistered);
+            var registered = await Device.add(req.body.event, req.body);
+            res.send(registered);
             break; 
         default:
             break;

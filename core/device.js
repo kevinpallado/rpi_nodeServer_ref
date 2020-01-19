@@ -283,5 +283,5 @@ function update(event, data)
 module.exports = {
     view: view,
     update: update,
-    adding: add
+    add: add
 }
