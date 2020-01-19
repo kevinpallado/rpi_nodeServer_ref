@@ -49,37 +49,35 @@ function view(event, data) {
                                 });
                             }
                             else {
-                                db.sql.query(sql_add, (err, rows, result) => {
-                                    console.log("Affected rows => " + rows.affectedRows);
-                                    dataResponse.register = 0;
-                                    resolve(dataResponse);
-                                });
+                                dataResponse.register = 0;
+                                console.log(" => " + dataResponse.register);
+                                resolve(dataResponse);
                             }
                         })
                     });
 
-                    // const unreg = new Promise((resolve, reject) => {
-                    //     db.sql.query(sql_search, (err, rows, results) => {
-                    //         if (err) throw error;
-                    //         if (rows.length == 0) {
-                    //             db.sql.query(sql_check, (err, rows, result) => {
-                    //                 if (err) throw error;
-                    //                 if (rows.length == 0) {
-                    //                     db.sql.query(sql_add, (err, rows, result) => {
-                    //                         console.log("Affected rows => " + rows.affectedRows);
-                    //                         dataResponse.register = 0;
-                    //                         resolve(dataResponse);
-                    //                     });
-                    //                 }
-                    //             });
-                    //         }
-                    //         else {
-                    //             dataResponse.register = 0;
-                    //             resolve(dataResponse);
-                    //         }
-                    //     })
-                    // });
-                    resolve(Promise.all([reg]));
+                    const unreg = new Promise((resolve, reject) => {
+                        db.sql.query(sql_search, (err, rows, results) => {
+                            if (err) throw error;
+                            if (rows.length == 0) {
+                                db.sql.query(sql_check, (err, rows, result) => {
+                                    if (err) throw error;
+                                    if (rows.length == 0) {
+                                        db.sql.query(sql_add, (err, rows, result) => {
+                                            console.log("Affected rows => " + rows.affectedRows);
+                                            dataResponse.register = 0;
+                                            resolve(dataResponse);
+                                        });
+                                    }
+                                });
+                            }
+                            else {
+                                dataResponse.register = 0;
+                                resolve(dataResponse);
+                            }
+                        })
+                    });
+                    resolve(Promise.all([reg, unreg]));
                 }
                 break;
             /**
