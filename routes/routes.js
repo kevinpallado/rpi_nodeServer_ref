@@ -59,7 +59,7 @@ Router.post("/devices/event", async(req, res) => {
             break;
 
         case "view-unregistered-device":
-            var unregistered = await Device._view(req.body.event, req.body);
+            var unregistered = await Device.view(req.body.event, req.body);
             res.send(unregistered);
 
         default:
