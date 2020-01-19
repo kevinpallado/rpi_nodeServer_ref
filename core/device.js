@@ -117,7 +117,7 @@ function view(event, data) {
             case "view-unregistered-device":
                 console.log("Hello unregistered");
                 var sql_unregistered = "SELECT * FROM unregistered_devices";
-                db.query(sql_unregistered, (err, rows, results) => {
+                db.sql.query(sql_unregistered, (err, rows, results) => {
                     if (err) {reject(err);}
                     else {resolve(rows);}});
 
@@ -156,7 +156,7 @@ function add(event, data) {
             case "register-devices":
                 console.log("control->:adding");
                 var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 1 + "','" + data.accountID + "')";
-                db.query(sql_register_device, (err, rows, results) => {
+                db.sql.query(sql_register_device, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
@@ -172,7 +172,7 @@ function add(event, data) {
                     "where accounts._id = registered_devices.accountID AND accounts._id = '" + data.accountID + "'" +
                     "AND application = '" + data.type + "'";
                 console.log(sql_view);
-                db.query(sql_view, (err, rows, results) => {
+                db.sql.query(sql_view, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
@@ -186,7 +186,7 @@ function add(event, data) {
                 var new_device_status = '';
                 data.status == 0 ? new_device_status = 1 : new_device_status = 0;
                 var sql_toogle = "UPDATE registered_devices SET status = '" + new_device_status + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
-                db.query(sql_toogle, (err, rows, results) => {
+                db.sql.query(sql_toogle, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
@@ -200,7 +200,7 @@ function add(event, data) {
                 console.log("Hello");
                 data.status == 0 ? new_device_status = 1 : new_device_status = 0;
                 var sql_toogle = "UPDATE registered_devices SET status = '" + new_device_status + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
-                db.query(sql_toogle, (err, rows, results) => {
+                db.sql.query(sql_toogle, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
@@ -209,7 +209,7 @@ function add(event, data) {
                             //toogle(new_device_status, data);
                             setTimeout(function () {
                                 var sql_toogle = "UPDATE registered_devices SET status = '" + 0 + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
-                                db.query(sql_toogle, (err, rows, results) => {
+                                db.sql.query(sql_toogle, (err, rows, results) => {
                                     if (err) {
                                         reject(err);
                                     }
@@ -226,7 +226,7 @@ function add(event, data) {
                 break;
             case "modal-appliances":
                 var sql_modal_appliances = "SELECT * from registered_devices where _id ='" + data.device_id + "'";
-                db.query(sql_modal_appliances, (err, rows, results) => {
+                db.sql.query(sql_modal_appliances, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
