@@ -5,9 +5,9 @@ const express = require('express'),
       Device = require('../core/device');
 
 Router.post("/account/event/", async (req, res) => {
-    switch(req.query.event) {
+    switch(req.body.event) {
         case "login":
-            var login = await Account.view(req.query.event, req.body);
+            var login = await Account.view(req.body.event, req.body);
             res.send(login);
             break;
             
