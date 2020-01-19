@@ -50,7 +50,7 @@ Router.post("/devices/event", async(req, res) => {
             break;
 
         case "view-registered-device":
-            var view_register_device = await Device.adding(req.body.event, req.body);
+            var view_register_device = await Device.add(req.body.event, req.body);
             res.send(view_register_device);
             break;
 
@@ -68,7 +68,10 @@ Router.post("/devices/event", async(req, res) => {
             var unregistered = await Device.view(req.body.event, req.body);
             res.send(unregistered);
             break;
-            
+        case "register-devices":
+            var unregistered = await Device.add(req.body.event, req.body);
+            res.send(unregistered);
+            break; 
         default:
             break;
     }
