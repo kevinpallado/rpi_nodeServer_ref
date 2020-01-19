@@ -47,21 +47,28 @@ Router.post("/devices/event", async(req, res) => {
             response = await Device.update(req.query.method, req.body);
             !response.error && req.body.state == 1 ? emon_timer = true : emon_timer = false;
             res.send(JSON.stringify(response));
+            break;
+
+        case "view-registered-device":
+            var view_register_device = await Device.adding(req.body.event, req.body);
+            res.send(view_register_device);
+            break;
 
         case "door-toogle-device":
-            var toogle = await Device.adding(req.body.event, req.body);
+            var toogle = await Device.add(req.body.event, req.body);
             res.send(JSON.stringify({ 'result': toogle }));
             break;
 
         case "modal-appliances":
-            var modal_appliances = await Device.adding(req.body.event, req.body);
+            var modal_appliances = await Device.add(req.body.event, req.body);
             res.send(modal_appliances);
             break;
 
         case "view-unregistered-device":
             var unregistered = await Device.view(req.body.event, req.body);
             res.send(unregistered);
-
+            break;
+            
         default:
             break;
     }
