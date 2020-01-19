@@ -12,6 +12,13 @@ const express = require('express'),
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
 const server = http.createServer(app);
 
@@ -43,9 +50,9 @@ s.on('connection', function (ws, req) {
     console.log("new client connected");
 });
 
-cron.schedule('*/15 * * * * *', () => {
-    console.log('running a task every 15 seconds');
-});
+// cron.schedule('*/15 * * * * *', () => {
+//     console.log('running a task every 15 seconds');
+// });
 
 cron.schedule('*/30 * * * *', () => {
     console.log("Will record consumption every 30 minutes");
