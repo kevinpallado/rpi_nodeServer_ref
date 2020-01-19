@@ -183,9 +183,9 @@ function add(event, data) {
                 break;
 
             case "toogle-device":
-                var new_device_status = '';
-                data.status == 0 ? new_device_status = 1 : new_device_status = 0;
-                var sql_toogle = "UPDATE registered_devices SET status = '" + new_device_status + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
+                var new_device_state = '';
+                data.state == 0 ? new_device_state = 1 : new_device_state = 0;
+                var sql_toogle = "UPDATE registered_devices SET state = '" + new_device_state + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                 db.sql.query(sql_toogle, (err, rows, results) => {
                     if (err) {
                         reject(err);
@@ -196,19 +196,19 @@ function add(event, data) {
                 });
                 break;
             case "door-toogle-device":
-                var new_device_status = '';
+                var new_device_state = '';
                 console.log("Hello");
-                data.status == 0 ? new_device_status = 1 : new_device_status = 0;
-                var sql_toogle = "UPDATE registered_devices SET status = '" + new_device_status + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
+                data.state == 0 ? new_device_state = 1 : new_device_state = 0;
+                var sql_toogle = "UPDATE registered_devices SET state = '" + new_device_state + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                 db.sql.query(sql_toogle, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
                     else {
-                        if (new_device_status == 1) {
+                        if (new_device_state == 1) {
                             //toogle(new_device_status, data);
                             setTimeout(function () {
-                                var sql_toogle = "UPDATE registered_devices SET status = '" + 0 + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
+                                var sql_toogle = "UPDATE registered_devices SET state = '" + 0 + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                                 db.sql.query(sql_toogle, (err, rows, results) => {
                                     if (err) {
                                         reject(err);
