@@ -58,9 +58,10 @@ function view(event, data) {
 
 function add(event, data) {
     return new Promise((resolve, reject) => {
+        console.log(data.PIN);
         switch (event) {
             case "add_account":
-                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "')";
+                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday,pin) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "'" + data.PIN + ")";
                 db.sql.query(sql_add, (err, rows, results) => {
                     if (!err) {
                         resolve(results);
