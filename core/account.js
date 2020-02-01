@@ -13,22 +13,43 @@ function view(event, data) {
             case "login":
                 var sql_login = "SELECT * FROM accounts WHERE firstName = '" + data.firstName + "' AND password = '" + data.password + "'";
                 db.sql.query(sql_login, (err, rows, results) => {
-                    console.log(err + " = " + JSON.stringify(rows));
+                    console.log(rows);
                     if (err) {
                         reject(err);
                     }
                     else {
-                        if(rows.length > 0)
-                        {
-                            console.log(rows);
-                            resolve(rows);
-                        }
-                        else
-                        {
-                            resolve(rows);
-                        }
+                        resolve(rows);
                     }
                 })
+            // db.sql.query(sql_login, (err, rows, results) => {
+            //     console.log(err + " = " + JSON.stringify(rows));
+            //     if (err) {
+            //         reject(err);
+            //     }
+            //     else {
+            //         if (rows.length > 0) {
+            //             console.log(rows);
+            //             resolve(rows);
+            //         }
+            //         else {
+            //             resolve(rows);
+            //         }
+            //     }
+            // });
+            case "get-pin":
+                console.log(data);
+
+                var sql_pin = "SELECT * FROM accounts WHERE pin= '" + data.pin + "' AND _id = '" + data.accountID + "'";
+                db.sql.query(sql_pin, (err, rows, results) => {
+                    console.log(rows);
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
+                    }
+                })
+                break;
             default:
                 break;
         }

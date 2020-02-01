@@ -1,17 +1,41 @@
 const db = require('../connection');
 
-function add(event,data)
-{
+function add(event, data) {
     return new Promise((resolve, reject) => {
+        console.log(event);
+        console.log("hello core");
         switch (event) {
             case "insert-consumptions":
-                var sql_device_consumptions = "INSERT INTO consumptions (voltage,current,power,dateRecorded,deviceID) VALUES ('" + data.voltage + "','" + data.current + "','" + data.power + "','" + getCurDate() + "','" + data.deviceID + "')";
-                console.log(sql_device_consumptions);
+                var sql_device_consumptions = "INSERT INTO consumptions (voltage,current,power,deviceID,account_id) VALUES ('" + data.voltage + "','" + data.current + "','" + data.power + "','" + data.deviceID + "','" + data.accountID + "')";
                 db.sql.query(sql_device_consumptions, (err, rows, results) => {
-                    if (err) throw error;
-                    resolve(rows.affectedRows);
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        var sql_view = "SELECT * from consumptions where  account_id ='" + data.accountID + "' order by dateRecorded desc ";
+                        db.sql.query(sql_view, (err, rows, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            else {
+                                resolve(rows);
+                            }
+                        });
+                        //resolve(results);
+                    }
                 });
-            break;
+                break;
+            case "view-consumptions":
+                var sql_view = "SELECT * from consumptions where  account_id ='" + data.accountID + "' order by dateRecorded desc  ";
+                db.sql.query(sql_view, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
+                    }
+                });
+                break;
         }
     });
 }
@@ -42,5 +66,6 @@ function getCurDate() {
     return year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
 }
 module.exports = {
-    add : add
+    add: add,
+    getCurDate: getCurDate
 }

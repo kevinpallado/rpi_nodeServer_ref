@@ -3,13 +3,13 @@ const db = require('../connection');
 function view(event, data) {
     return new Promise(function (resolve, reject) {
         var macaddr = data.macAddress;
-        var dataResponse = 
+        var dataResponse =
         {
-            accountid : 0,
-            deviceid : 0,
-            state : 0,
+            accountid: 0,
+            deviceid: 0,
+            state: 0,
             application: 0,
-            count : 0,
+            count: 0,
             init_setup: true
         };
         switch (event) {
@@ -106,13 +106,12 @@ function view(event, data) {
                 var sql_state = "SELECT * FROM registered_devices WHERE accountID = '" + data.accountid + "' AND macAddress LIKE '" + data.macAddress + "%'";
                 db.sql.query(sql_state, (err, rows, results) => {
                     if (err) throw error;
-                        if(rows.length > 0)
-                        {
-                            dataResponse.application = rows[0].application;
-                            dataResponse.state = rows[0].state;
-                            dataResponse.init_setup = false;
-                            resolve(dataResponse);
-                        }
+                    if (rows.length > 0) {
+                        dataResponse.application = rows[0].application;
+                        dataResponse.state = rows[0].state;
+                        dataResponse.init_setup = false;
+                        resolve(dataResponse);
+                    }
                 });
 
             /**
@@ -125,8 +124,7 @@ function view(event, data) {
                 db.sql.query(sql_unreg, (err, rows, results) => {
                     if (err) throw error;
                     if (rows.length > 0) {
-                        for(var i=0; i<rows.length; i++)
-                        {
+                        for (var i = 0; i < rows.length; i++) {
                             unreg_dlists.push({ id: rows[i]._id, macAddress: rows[i].macAddress });
                         }
                         resolve(unreg_dlists);
@@ -137,8 +135,9 @@ function view(event, data) {
                 console.log("Hello unregistered");
                 var sql_unregistered = "SELECT * FROM unregistered_devices";
                 db.sql.query(sql_unregistered, (err, rows, results) => {
-                    if (err) {reject(err);}
-                    else {resolve(rows);}});
+                    if (err) { reject(err); }
+                    else { resolve(rows); }
+                });
 
             case "registered-devices":
                 var sql_designation = "SELECT rd._id, rd.application, rd.deviceLists, rd.area, rd.macAddress, rd.state, acc.firstName, acc.lastName FROM registered_devices as rd LEFT JOIN accounts as acc ON rd.accountID = acc._id WHERE acc._id = '" + data.accountid + "'";
@@ -146,17 +145,17 @@ function view(event, data) {
                 db.sql.query(sql_designation, (err, rows, results) => {
                     if (err) throw error;
                     if (rows.length > 0) {
-                        for(var i=0; i<rows.length; i++)
-                        {
-                            reg_dlists.push({ id: rows[i]._id,
-                                              application: rows[i].application,
-                                              deviceLists: rows[i].deviceLists,
-                                              area: rows[i].area,
-                                              macAddress: rows[i].macAddress,
-                                              state: rows[i].state,
-                                              firstName: rows[i].firstName,
-                                              lastName: rows[i].lastName
-                                             });
+                        for (var i = 0; i < rows.length; i++) {
+                            reg_dlists.push({
+                                id: rows[i]._id,
+                                application: rows[i].application,
+                                deviceLists: rows[i].deviceLists,
+                                area: rows[i].area,
+                                macAddress: rows[i].macAddress,
+                                state: rows[i].state,
+                                firstName: rows[i].firstName,
+                                lastName: rows[i].lastName
+                            });
                         }
                         resolve(reg_dlists);
                     }
@@ -204,12 +203,52 @@ function add(event, data) {
             case "toogle-device":
                 var new_device_state = '';
                 data.state == 0 ? new_device_state = 1 : new_device_state = 0;
+                console.log("hello");
                 var sql_toogle = "UPDATE registered_devices SET state = '" + new_device_state + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                 db.sql.query(sql_toogle, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
                     else {
+                        var sendNotification = function (data) {
+                            var headers = {
+                                "Content-Type": "application/json; charset=utf-8",
+                                "Authorization": "Basic NGUzOGM5ZTMtYWNiYS00YjVmLTlkMjUtNWEyNjgzYWE4Y2I2"
+                            };
+
+                            var options = {
+                                host: "onesignal.com",
+                                port: 443,
+                                path: "/api/v1/notifications",
+                                method: "POST",
+                                headers: headers
+                            };
+
+                            var https = require('https');
+                            var req = https.request(options, function (res) {
+                                res.on('data', function (data) {
+                                    console.log("Response:");
+                                    console.log(JSON.parse(data));
+                                });
+                            });
+
+                            req.on('error', function (e) {
+                                console.log("ERROR:");
+                                console.log(e);
+                            });
+
+                            req.write(JSON.stringify(data));
+                            req.end();
+                        };
+
+                        var message = {
+                            app_id: "2512695d-9642-462f-ad9e-cc4b3c1109bf",
+                            contents: { "en": "English Message" },
+                            included_segments: ["All"]
+                        };
+                        console.log("SEnd Notif");
+                        sendNotification(message);
+                        console.log(message);
                         resolve(results);
                     }
                 });
@@ -250,6 +289,7 @@ function add(event, data) {
                         reject(err);
                     }
                     else {
+
                         resolve(rows);
                     }
                 });
@@ -259,42 +299,38 @@ function add(event, data) {
     });
 }
 
-function update(event, data)
-{
+function update(event, data) {
     return new Promise((resolve, reject) => {
-        var dataResponse = 
+        var dataResponse =
         {
             macaddr: 0,
             message: "",
             error: null
         };
-        switch(event)
-        {
+        switch (event) {
             case "device-state":
                 var sql_device_update = "UPDATE registered_devices SET state = '" + data.state + "' WHERE macAddress LIKE '" + data.macaddr + "%' AND accountID = '" + data.accountid + "'";
                 db.sql.query(sql_device_update, (err, rows, results) => {
                     if (err) throw error;
-                    if(rows.affectedRows > 0)
-                    {
+                    if (rows.affectedRows > 0) {
                         dataResponse.error = false;
                         dataResponse.message = "Successfully update device state on macaddress " + data.macaddr;
                         dataResponse.macaddr = data.macaddr;
 
                         resolve(dataResponse);
                     }
-                    else
-                    {
+                    else {
                         dataResponse.error = true;
                         dataResponse.message = "Something went wrong please check your variable request";
 
                         resolve(dataResponse);
                     }
                 });
-            break;
+                break;
 
             case "device-designation":
 
-            break;
+                break;
         }
     });
 }
