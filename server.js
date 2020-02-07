@@ -12,6 +12,9 @@ const express = require('express'),
 let https = require('http').Server(app);
 let io = require('socket.io')(https);
 
+io.path('/echo');
+
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -37,33 +40,72 @@ app.get('/', function (req, res) {
 });
 
 
+var notes = [];
 io.sockets.on('connection', function (socket) {
 
-
-    sendData(socket); // Excisting Socket
-
+    console.log("connected on the Socket");
+    // sendData1(socket); // Excisting Socket
+    socket.on('DataOfConsumption', function (data) {
+        notes.push(data)
+    });
 })
 
 
-let voltage = 0;
-let current = 5;
-let power = 3;
-function sendData(socket) {
-    socket.emit('data1', {
-        voltage: voltage,
-        current: current,
-        power: power,
-        _id: 25,
-        created: new Date(),
+cron.schedule('*/5 * * * * *', () => {
+    console.log("5 Seconds");
+    console.log(notes);
+    io.sockets.on('DataOfConsumption', function (data) {
+        notes.push(data);
+
+        // var sql_search = "INSERT INTO consumptions (voltage, current, power, deviceID, accountID) VALUES ('" + data.voltage + "','" + data.current + "','" + data.power + "','" + 53 + "','" + 6 + "')";
+        // db.sql.query(sql_search, (err, rows, results) => {
+        //     resolve(rows.length);
+        //     console.log(rows.length);
+        // });
     });
-    console.log('tr');
-    setTimeout(() => {
-        sendData(socket);
-        voltage++;
-        current++;
-        power++;
-    }, 2000);
-}
+
+
+
+
+    // function sendData(socket) {
+    //     socket.emit('data1', {  
+    //         voltage: voltage,
+    //         current: current,
+    //         power: power,
+    //         _id: 53,
+    //         created: new Date(),
+    //     });
+
+    //     setTimeout(() => {
+    //         sendData(socket);
+    //         voltage++;
+    //         current++;
+    //         power++;
+    //     }, 2000);
+    // }
+});
+
+// function sendData(socket) {
+//     socket.emit('data1', {
+//         voltage: voltage,
+//         current: current,
+//         power: power,
+//         _id: 53,
+//         created: new Date(),
+//     });
+
+//     setTimeout(() => {
+//         sendData(socket);
+//         voltage++;
+//         current++;
+//         power++;
+//     }, 2000);
+// }
+
+
+
+
+
 // s.on('connection', function (ws, req) {
 
 //     ws.on('message', function (message) {
@@ -81,9 +123,8 @@ function sendData(socket) {
 //     console.log("new client connected");
 // });
 
-// cron.schedule('*/15 * * * * *', () => {
-//     console.log('running a task every 15 seconds');
-// });
+
+
 
 // cron.schedule('*/30 * * * *', () => {
 //     console.log("Will record consumption every 30 minutes");

@@ -172,8 +172,8 @@ function add(event, data) {
 
         switch (event) {
             case "register-devices":
-                console.log("control->:adding");
-                var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 1 + "','" + data.accountID + "')";
+
+                var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 0 + "','" + data.accountID + "')";
                 db.sql.query(sql_register_device, (err, rows, results) => {
                     if (err) {
                         reject(err);
@@ -189,7 +189,7 @@ function add(event, data) {
                 var sql_view = "SELECT *,registered_devices._id as registered_devices_id from accounts,registered_devices " +
                     "where accounts._id = registered_devices.accountID AND accounts._id = '" + data.accountID + "'" +
                     "AND application = '" + data.type + "'";
-                console.log(sql_view);
+                //console.log(sql_view);
                 db.sql.query(sql_view, (err, rows, results) => {
                     if (err) {
                         reject(err);
@@ -202,6 +202,7 @@ function add(event, data) {
 
             case "toogle-device":
                 var new_device_state = '';
+                console.log(data.state);
                 data.state == 0 ? new_device_state = 1 : new_device_state = 0;
                 console.log("hello");
                 var sql_toogle = "UPDATE registered_devices SET state = '" + new_device_state + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
@@ -210,45 +211,45 @@ function add(event, data) {
                         reject(err);
                     }
                     else {
-                        var sendNotification = function (data) {
-                            var headers = {
-                                "Content-Type": "application/json; charset=utf-8",
-                                "Authorization": "Basic NGUzOGM5ZTMtYWNiYS00YjVmLTlkMjUtNWEyNjgzYWE4Y2I2"
-                            };
+                        // var sendNotification = function (data) {
+                        //     var headers = {
+                        //         "Content-Type": "application/json; charset=utf-8",
+                        //         "Authorization": "Basic NGUzOGM5ZTMtYWNiYS00YjVmLTlkMjUtNWEyNjgzYWE4Y2I2"
+                        //     };
 
-                            var options = {
-                                host: "onesignal.com",
-                                port: 443,
-                                path: "/api/v1/notifications",
-                                method: "POST",
-                                headers: headers
-                            };
+                        //     var options = {
+                        //         host: "onesignal.com",
+                        //         port: 443,
+                        //         path: "/api/v1/notifications",
+                        //         method: "POST",
+                        //         headers: headers
+                        //     };
 
-                            var https = require('https');
-                            var req = https.request(options, function (res) {
-                                res.on('data', function (data) {
-                                    console.log("Response:");
-                                    console.log(JSON.parse(data));
-                                });
-                            });
+                        //     var https = require('https');
+                        //     var req = https.request(options, function (res) {
+                        //         res.on('data', function (data) {
+                        //             console.log("Response:");
+                        //             console.log(JSON.parse(data));
+                        //         });
+                        //     });
 
-                            req.on('error', function (e) {
-                                console.log("ERROR:");
-                                console.log(e);
-                            });
+                        //     req.on('error', function (e) {
+                        //         console.log("ERROR:");
+                        //         console.log(e);
+                        //     });
 
-                            req.write(JSON.stringify(data));
-                            req.end();
-                        };
+                        //     req.write(JSON.stringify(data));
+                        //     req.end();
+                        // };
 
-                        var message = {
-                            app_id: "2512695d-9642-462f-ad9e-cc4b3c1109bf",
-                            contents: { "en": "English Message" },
-                            included_segments: ["All"]
-                        };
-                        console.log("SEnd Notif");
-                        sendNotification(message);
-                        console.log(message);
+                        // var message = {
+                        //     app_id: "2512695d-9642-462f-ad9e-cc4b3c1109bf",
+                        //     contents: { "en": "English Message" },
+                        //     included_segments: ["All"]
+                        // };
+                        // console.log("SEnd Notif");
+                        // sendNotification(message);
+                        //console.log(message);
                         resolve(results);
                     }
                 });

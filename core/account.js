@@ -61,10 +61,15 @@ function add(event, data) {
         console.log(data.PIN);
         switch (event) {
             case "add_account":
-                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday,pin) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "'" + data.PIN + ")";
+                console.log("add");
+                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday,pin) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "','" + data.PIN + "')";
                 db.sql.query(sql_add, (err, rows, results) => {
-                    if (!err) {
-                        resolve(results);
+                    console.log(rows);
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
                     }
                 });
                 break;
