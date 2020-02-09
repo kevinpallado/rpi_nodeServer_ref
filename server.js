@@ -39,6 +39,40 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
+app.post('/data-receiver', async (req, res) => {
+    
+    // req.body dayun ang data gaw
+    /**
+     * Ang json data dayun kay kani
+     * kung appliances
+     * {
+     * "macAddress" = asdasd,
+        "accoundId" = 1,
+        "deviceId" = 4,
+     *  "power" = 20,
+        "e_usage" = 45,
+        "e_cost" = 2.05,
+        "device" = "Appliances",
+        "state" = 0
+     * }
+     kung door
+     {
+     * "macAddress" = asdasd,
+        "accoundId" = 1,
+        "deviceId" = 4,
+        "device" = "Door",
+        "state" = 0
+     * }
+     kung window ( si window walay command nga mag open or close igo ra niya e update ang user nga na open or close ang window mag notify dayun ka gaw if na open ang window)
+     {
+     * "macAddress" = asdasd,
+        "accoundId" = 1,
+        "deviceId" = 4,
+        "device" = "Door",
+        "state" = 0
+     * }
+     */
+});
 
 var notes = [];
 io.sockets.on('connection', function (socket) {
