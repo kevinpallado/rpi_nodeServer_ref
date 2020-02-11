@@ -172,7 +172,7 @@ function add(event, data) {
 
         switch (event) {
             case "register-devices":
-
+                console.log("hellllooo registerd device");
                 var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 0 + "','" + data.accountID + "')";
                 db.sql.query(sql_register_device, (err, rows, results) => {
                     if (err) {
@@ -180,6 +180,7 @@ function add(event, data) {
                     }
                     else {
                         resolve(results);
+
                     }
                 });
                 break;

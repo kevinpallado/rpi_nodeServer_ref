@@ -9,10 +9,12 @@ const express = require('express'),
     cron = require('node-cron'),
     file = new static.Server('./'),
     app = express();
+const db = require('./connection');
+
 let https = require('http').Server(app);
 let io = require('socket.io')(https);
 
-io.path('/echo');
+//io.path('/pathway');
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -31,16 +33,40 @@ const server = http.createServer(app);
 require('dns').lookup(require('os').hostname(), function (err, add, fam) {
     console.log('addr: ' + add);
 });
-const WebSocket = require('ws');
-const s = new WebSocket.Server({ server: server, path: "/echo", noServer: true });
+// const WebSocket = require('ws');
+// const s = new WebSocket.Server({ server: server, path: "/echo", noServer: true });
 
 app.use('/automation', routes.Router);
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
+
+var devices = [];
+var consumption = [];
+var sql_view = "SELECT * from registered_devices";
+db.sql.query(sql_view, (err, rows, results) => {
+    if (err) {
+        console.log(err);
+    }
+    else {
+        rows.forEach(element => {
+            devices.push(element.macAddress)
+        });
+    }
+});
 app.post('/data-receiver', async (req, res) => {
-    
+    for (var i = 0; i < devices.length; i++) {
+        console.log(devices[i]);
+        if (devices[i] == req.body['macAddress']) {
+            consumption.push(req.body);
+        }
+    }
+    // console.log("res");
+    // notes.push(req.body['macAddress']);
+
+
+    //console.log(res);
     // req.body dayun ang data gaw
     /**
      * Ang json data dayun kay kani
@@ -50,7 +76,7 @@ app.post('/data-receiver', async (req, res) => {
         "accoundId" = 1,
         "deviceId" = 4,
      *  "power" = 20,
-        "e_usage" = 45,
+        "e_usage" = 45, 
         "e_cost" = 2.05,
         "device" = "Appliances",
         "state" = 0
@@ -74,67 +100,37 @@ app.post('/data-receiver', async (req, res) => {
      */
 });
 
-var notes = [];
-io.sockets.on('connection', function (socket) {
 
+io.sockets.on('connection', function (socket) {
     console.log("connected on the Socket");
     // sendData1(socket); // Excisting Socket
     socket.on('DataOfConsumption', function (data) {
-        notes.push(data)
+        notes.push(data[0]['macAddress'])
     });
 })
 
 
 cron.schedule('*/5 * * * * *', () => {
-    console.log("5 Seconds");
-    console.log(notes);
-    io.sockets.on('DataOfConsumption', function (data) {
-        notes.push(data);
+    console.log(consumption);
+    result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
+    //console.log(result[0].macAddress);
+    if (result) {
+        for (var i = 0; i < result.length; i++) {
+            var sql_device_consumptions = "INSERT INTO consumptions (voltage,current,power,deviceID) VALUES ('" + result[i].voltage + "','" + result[i].current + "','" + result[i].power + "','" + result[i].deviceID + "')";
+            db.sql.query(sql_device_consumptions, (err, rows, results) => {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    console.log("Inserted Consumptions");
+                }
+            });
+        }
+    } else {
+        console.log("nothing");
+    }
 
-        // var sql_search = "INSERT INTO consumptions (voltage, current, power, deviceID, accountID) VALUES ('" + data.voltage + "','" + data.current + "','" + data.power + "','" + 53 + "','" + 6 + "')";
-        // db.sql.query(sql_search, (err, rows, results) => {
-        //     resolve(rows.length);
-        //     console.log(rows.length);
-        // });
-    });
-
-
-
-
-    // function sendData(socket) {
-    //     socket.emit('data1', {  
-    //         voltage: voltage,
-    //         current: current,
-    //         power: power,
-    //         _id: 53,
-    //         created: new Date(),
-    //     });
-
-    //     setTimeout(() => {
-    //         sendData(socket);
-    //         voltage++;
-    //         current++;
-    //         power++;
-    //     }, 2000);
-    // }
 });
-
-// function sendData(socket) {
-//     socket.emit('data1', {
-//         voltage: voltage,
-//         current: current,
-//         power: power,
-//         _id: 53,
-//         created: new Date(),
-//     });
-
-//     setTimeout(() => {
-//         sendData(socket);
-//         voltage++;
-//         current++;
-//         power++;
-//     }, 2000);
-// }
 
 
 
