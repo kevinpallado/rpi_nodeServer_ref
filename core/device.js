@@ -23,14 +23,15 @@ function view(event, data) {
                     var sql_check = "SELECT * FROM unregistered_devices WHERE macAddress LIKE '" + macaddr + "%'";
                     var sql_remove = "DELETE FROM unregistered_devices WHERE macAddress LIKE '" + macaddr + "%'";
                     const reg = new Promise((resolve, reject) => {
-                        db.sql.query(sql_search, (err, rows, results) => {
+                        db.sql.query(sql_search, async (err, rows, results) => {
                             if (err) throw error;
+                            
                             if (rows.length > 0) {  // if register, just check to unreg devices
                                 dataResponse.accountid = rows[0].accountID;
                                 dataResponse.deviceid = rows[0]._id;
                                 dataResponse.state = rows[0].state;
                                 dataResponse.application = rows[0].application;
-                                db.sql.query(sql_check, (err, rows, result) => {
+                                await db.sql.query(sql_check, async (err, rows, result) => {
                                     if (err) throw error;
                                     if (rows.length == 0) // if mac is not exists means it is already registered
                                     {
@@ -39,7 +40,7 @@ function view(event, data) {
                                         resolve(dataResponse);
                                     }
                                     else { // else it is just newly registered on the device
-                                        db.sql.query(sql_remove, (err, rows, result) => {
+                                        await db.sql.query(sql_remove, async (err, rows, result) => {
                                             if (err) throw error;
                                             console.log("Affected rows => " + rows.affectedRows);
                                             dataResponse.register = rows.affectedRows;
@@ -52,9 +53,9 @@ function view(event, data) {
                                 // dataResponse.register = 0;
                                 // console.log(" => " + dataResponse.register);
                                 // resolve(dataResponse);
-                                db.sql.query(sql_search, (err, rows, results) => {
-                                    if (err) throw error;
-                                    if (rows.length == 0) {
+                                // db.sql.query(sql_search, async(err, rows, results) => {
+                                //     if (err) throw error;
+                                //     if (rows.length == 0) {
                                         db.sql.query(sql_check, (err, rows, result) => {
                                             if (err) throw error;
                                             if (rows.length == 0) {
@@ -64,13 +65,18 @@ function view(event, data) {
                                                     resolve(dataResponse);
                                                 });
                                             }
+                                            else
+                                            {
+                                                dataResponse.register = 0;
+                                                resolve(dataResponse);
+                                            }
                                         });
-                                    }
-                                    else {
-                                        dataResponse.register = 0;
-                                        resolve(dataResponse);
-                                    }
-                                })
+                                    // }
+                                //     else {
+                                //         dataResponse.register = 0;
+                                //         resolve(dataResponse);
+                                //     }
+                                // })
                             }
                         })
                     });
