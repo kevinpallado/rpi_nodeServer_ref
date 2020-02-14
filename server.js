@@ -57,7 +57,7 @@ db.sql.query(sql_view, (err, rows, results) => {
 });
 app.post('/data-receiver', async (req, res) => {
     for (var i = 0; i < devices.length; i++) {
-        console.log(devices[i]);
+        //console.log(devices[i]);
         if (devices[i] == req.body['macAddress']) {
             consumption.push(req.body);
         }
@@ -103,28 +103,60 @@ app.post('/data-receiver', async (req, res) => {
 
 io.sockets.on('connection', function (socket) {
     console.log("connected on the Socket");
-    // sendData1(socket); // Excisting Socket
-    socket.on('DataOfConsumption', function (data) {
-        notes.push(data[0]['macAddress'])
-    });
+    //result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
+
+    // result = [...new Map(consumption.map(x => [x.macAddress, x])).values()];
+    // if (result == '') {
+    //     console.log('empty');
+    // }
+    // else {
+    socket.emit('a4cf1299cefc', {
+        macAddress: 'a4cf1299cefc',
+        deviceID: '55',
+        power: '100',
+        current: '200',
+        voltage: '300',
+        device: 'Appliances'
+    })
+
+
 })
+
+// let number = 0;
+// function sendData(socket) {
+//     socket.emit('data1', {
+//         text: number,
+//         created: new Date()
+//     });
+//     console.log('tr');
+//     setTimeout(() => {
+//         sendData(socket);
+//         number++;
+//     }, 2000);
+// }
 
 
 cron.schedule('*/5 * * * * *', () => {
-    console.log(consumption);
+    //console.log(JSON.stringify(consumption));
     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
-    //console.log(result[0].macAddress);
+    console.log(result);
+    if (result == '') {
+
+    } else {
+        console.log(result[0].macAddress);
+
+    }
     if (result) {
         for (var i = 0; i < result.length; i++) {
-            var sql_device_consumptions = "INSERT INTO consumptions (voltage,current,power,deviceID) VALUES ('" + result[i].voltage + "','" + result[i].current + "','" + result[i].power + "','" + result[i].deviceID + "')";
-            db.sql.query(sql_device_consumptions, (err, rows, results) => {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log("Inserted Consumptions");
-                }
-            });
+            // var sql_device_consumptions = "INSERT INTO consumptions (voltage,current,power,deviceID) VALUES ('" + result[i].voltage + "','" + result[i].current + "','" + result[i].power + "','" + result[i].deviceID + "')";
+            // db.sql.query(sql_device_consumptions, (err, rows, results) => {
+            //     if (err) {
+            //         console.log(err);
+            //     }
+            //     else {
+            //         console.log("Inserted Consumptions");
+            //     }
+            // });
         }
     } else {
         console.log("nothing");

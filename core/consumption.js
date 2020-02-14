@@ -26,7 +26,7 @@ function add(event, data) {
                 });
                 break;
             case "view-consumptions":
-                var sql_view = "SELECT * from consumptions where  account_id ='" + data.accountID + "' order by dateRecorded desc  ";
+                var sql_view = "SELECT * from consumptions order by dateRecorded desc  ";
                 db.sql.query(sql_view, (err, rows, results) => {
                     if (err) {
                         reject(err);
