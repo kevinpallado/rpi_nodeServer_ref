@@ -25,12 +25,13 @@ function view(event, data) {
                     const reg = new Promise((resolve, reject) => {
                         db.sql.query(sql_search, async (err, rows, results) => {
                             if (err) throw error;
-                            
+
                             if (rows.length > 0) {  // if register, just check to unreg devices
                                 dataResponse.accountid = rows[0].accountID;
                                 dataResponse.deviceid = rows[0]._id;
                                 dataResponse.state = rows[0].state;
                                 dataResponse.application = rows[0].application;
+                                dataResponse.password = rows[0].pin;
                                 await db.sql.query(sql_check, async (err, rows, result) => {
                                     if (err) throw error;
                                     if (rows.length == 0) // if mac is not exists means it is already registered
@@ -56,22 +57,21 @@ function view(event, data) {
                                 // db.sql.query(sql_search, async(err, rows, results) => {
                                 //     if (err) throw error;
                                 //     if (rows.length == 0) {
-                                        db.sql.query(sql_check, (err, rows, result) => {
-                                            if (err) throw error;
-                                            if (rows.length == 0) {
-                                                db.sql.query(sql_add, (err, rows, result) => {
-                                                    console.log("Affected rows => " + rows.affectedRows);
-                                                    dataResponse.register = 0;
-                                                    resolve(dataResponse);
-                                                });
-                                            }
-                                            else
-                                            {
-                                                dataResponse.register = 0;
-                                                resolve(dataResponse);
-                                            }
+                                db.sql.query(sql_check, (err, rows, result) => {
+                                    if (err) throw error;
+                                    if (rows.length == 0) {
+                                        db.sql.query(sql_add, (err, rows, result) => {
+                                            console.log("Affected rows => " + rows.affectedRows);
+                                            dataResponse.register = 0;
+                                            resolve(dataResponse);
                                         });
-                                    // }
+                                    }
+                                    else {
+                                        dataResponse.register = 0;
+                                        resolve(dataResponse);
+                                    }
+                                });
+                                // }
                                 //     else {
                                 //         dataResponse.register = 0;
                                 //         resolve(dataResponse);
@@ -178,15 +178,14 @@ function add(event, data) {
 
         switch (event) {
             case "register-devices":
-                console.log("hellllooo registerd device");
-                var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 0 + "','" + data.accountID + "')";
+                var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID,pin) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 0 + "','" + data.accountID + "','" + data.pin + "')";
                 db.sql.query(sql_register_device, (err, rows, results) => {
                     if (err) {
                         reject(err);
                     }
                     else {
-                        resolve(results);
-
+                        resolve(rows);
+                        //console.log(rows);
                     }
                 });
                 break;
@@ -194,8 +193,9 @@ function add(event, data) {
             case "view-registered-device":
                 console.log(data.type);
                 var sql_view = "SELECT *,registered_devices._id as registered_devices_id from accounts,registered_devices " +
-                    "where accounts._id = registered_devices.accountID AND accounts._id = '" + data.accountID + "'" +
-                    "AND application = '" + data.type + "'";
+                    "where accounts._id = registered_devices.accountID AND accounts._id = '" + data.accountID + "'"
+                    + "AND application = '" + data.type + "'";
+
                 //console.log(sql_view);
                 db.sql.query(sql_view, (err, rows, results) => {
                     if (err) {
@@ -218,6 +218,20 @@ function add(event, data) {
                         reject(err);
                     }
                     else {
+                        // var sql_view = "SELECT *,registered_devices._id as registered_devices_id from accounts,registered_devices " +
+                        //     "where accounts._id = registered_devices.accountID AND accounts._id = '" + data.accountID + "'"
+                        //     + "AND application = '" + data.type + "'";
+
+                        // db.sql.query(sql_view, (err, rows, results) => {
+                        //     if (err) {
+                        //         reject(err);
+                        //     }
+                        //     else {
+                        //         resolve(rows);
+                        //         // console.log("HelloToggle");
+                        //         console.log(rows);
+                        //     }
+                        // });
                         // var sendNotification = function (data) {
                         //     var headers = {
                         //         "Content-Type": "application/json; charset=utf-8",

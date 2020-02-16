@@ -61,6 +61,10 @@ app.post('/data-receiver', async (req, res) => {
         if (devices[i] == req.body['macAddress']) {
             consumption.push(req.body);
         }
+
+        if (req.body['device'] == 'Window') {
+
+        }
     }
     // console.log("res");
     // notes.push(req.body['macAddress']);
@@ -103,6 +107,9 @@ app.post('/data-receiver', async (req, res) => {
 
 io.sockets.on('connection', function (socket) {
     console.log("connected on the Socket");
+    sendData(socket);
+    //window(socket);
+    //var con = 'a4cf1299cefc'
     //result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
 
     // result = [...new Map(consumption.map(x => [x.macAddress, x])).values()];
@@ -110,40 +117,67 @@ io.sockets.on('connection', function (socket) {
     //     console.log('empty');
     // }
     // else {
-    socket.emit('a4cf1299cefc', {
-        macAddress: 'a4cf1299cefc',
-        deviceID: '55',
-        power: '100',
-        current: '200',
-        voltage: '300',
-        device: 'Appliances'
-    })
+
 
 
 })
 
 // let number = 0;
-// function sendData(socket) {
-//     socket.emit('data1', {
-//         text: number,
-//         created: new Date()
-//     });
-//     console.log('tr');
-//     setTimeout(() => {
-//         sendData(socket);
-//         number++;
-//     }, 2000);
+
+// function window(socket) {
+//     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
+//     if (result == '') {
+
+//     } else {
+//         for (var i = 0; i <= result.length; i++) {
+//             if (result[i].device == 'Door') {
+//                 console.log("has Data");
+//             } else {
+//                 console.log("No Data");
+//             }
+//         }
+//     }
 // }
+function sendData(socket) {
+
+    result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
+    if (result == '') {
+
+
+    } else {
+        for (var i = 0; i <= result.length; i++) {
+
+            if (result[i]) {
+                if (result[i] == undefined) {
+                    console.log("undefined");
+                } else {
+                    socket.emit(result[i].macAddress, {
+                        macAddress: result[i].macAddress,
+                        deviceID: result[i].deviceID,
+                        power: result[i].power,
+                        current: result[i].current,
+                        voltage: result[i].voltage,
+                        device: result[i].device
+                    });
+                }
+            }
+
+        }
+    }
+    setTimeout(() => {
+        sendData(socket);
+
+    }, 2000);
+}
 
 
 cron.schedule('*/5 * * * * *', () => {
-    //console.log(JSON.stringify(consumption));
     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
-    console.log(result);
+    //console.log(result);
     if (result == '') {
 
     } else {
-        console.log(result[0].macAddress);
+        //console.log(result[0].macAddress);
 
     }
     if (result) {
