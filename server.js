@@ -44,6 +44,7 @@ app.get('/', function (req, res) {
 
 var devices = [];
 var consumption = [];
+var window = [];
 var sql_view = "SELECT * from registered_devices";
 db.sql.query(sql_view, (err, rows, results) => {
     if (err) {
@@ -57,12 +58,17 @@ db.sql.query(sql_view, (err, rows, results) => {
 });
 app.post('/data-receiver', async (req, res) => {
     for (var i = 0; i < devices.length; i++) {
-        //console.log(devices[i]);
         if (devices[i] == req.body['macAddress']) {
             consumption.push(req.body);
         }
 
         if (req.body['device'] == 'Window') {
+            if (devices[i] == req.body['macAddress']) {
+                //console.log(req.body);
+                window.push(req.body);
+            } else {
+
+            }
 
         }
     }
@@ -105,21 +111,10 @@ app.post('/data-receiver', async (req, res) => {
 });
 
 
-io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', function (socket, soc) {
     console.log("connected on the Socket");
     sendData(socket);
-    //window(socket);
-    //var con = 'a4cf1299cefc'
-    //result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
-
-    // result = [...new Map(consumption.map(x => [x.macAddress, x])).values()];
-    // if (result == '') {
-    //     console.log('empty');
-    // }
-    // else {
-
-
-
+    windowData(socket);
 })
 
 // let number = 0;
@@ -138,6 +133,35 @@ io.sockets.on('connection', function (socket) {
 //         }
 //     }
 // }
+
+
+function windowData(socket) {
+    result = [...new Map(window.map(x => [x.macAddress, x])).values()]
+    if (result == '') {
+
+    } else {
+        // console.log(result);
+        for (var i = 0; i <= result.length; i++) {
+
+            if (result[i]) {
+                if (result[i] == undefined) {
+                    console.log("undefined");
+                } else {
+                    socket.emit('door', {
+                        macAddress: result[i].macAddress,
+                        deviceID: result[i].deviceID,
+                        state: result[i].state,
+                    });
+                }
+            }
+
+        }
+    }
+    setTimeout(() => {
+        windowData(socket);
+
+    }, 2000);
+}
 function sendData(socket) {
 
     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
@@ -173,11 +197,10 @@ function sendData(socket) {
 
 cron.schedule('*/5 * * * * *', () => {
     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
-    //console.log(result);
+
     if (result == '') {
 
     } else {
-        //console.log(result[0].macAddress);
 
     }
     if (result) {

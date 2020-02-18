@@ -21,26 +21,24 @@ function view(event, data) {
                         resolve(rows);
                     }
                 })
-            // db.sql.query(sql_login, (err, rows, results) => {
-            //     console.log(err + " = " + JSON.stringify(rows));
-            //     if (err) {
-            //         reject(err);
-            //     }
-            //     else {
-            //         if (rows.length > 0) {
-            //             console.log(rows);
-            //             resolve(rows);
-            //         }
-            //         else {
-            //             resolve(rows);
-            //         }
-            //     }
-            // });
             case "get-pin":
                 console.log(data);
 
                 var sql_pin = "SELECT * FROM accounts WHERE pin= '" + data.pin + "' AND _id = '" + data.accountID + "'";
                 db.sql.query(sql_pin, (err, rows, results) => {
+                    console.log(rows);
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
+                    }
+                })
+                break;
+            case "account-setting":
+                console.log("hello");
+                var sql_account_setting = "SELECT * FROM accounts WHERE  _id = '" + data.accountID + "'";
+                db.sql.query(sql_account_setting, (err, rows, results) => {
                     console.log(rows);
                     if (err) {
                         reject(err);
