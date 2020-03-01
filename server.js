@@ -57,8 +57,9 @@ db.sql.query(sql_view, (err, rows, results) => {
     }
 });
 app.post('/data-receiver', async (req, res) => {
-
+    //console.log(req.body);
     for (var i = 0; i < devices.length; i++) {
+
         if (devices[i] == req.body['macAddress']) {
             consumption.push(req.body);
         }
@@ -66,7 +67,7 @@ app.post('/data-receiver', async (req, res) => {
         if (req.body['device'] == 'Window') {
             if (devices[i] == req.body['macAddress']) {
 
-                //console.log(req.body);
+                console.log(req.body);
                 window.push(req.body);
             } else {
 
@@ -199,7 +200,7 @@ function sendData(socket) {
 
 cron.schedule('*/5 * * * * *', () => {
     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
-
+    console.log(result);
     if (result == '') {
 
     } else {
