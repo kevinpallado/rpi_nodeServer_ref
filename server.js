@@ -38,7 +38,7 @@ require('dns').lookup(require('os').hostname(), function (err, add, fam) {
 
 app.use('/automation', routes.Router);
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
+    res.sendFile('client/index.html');
 });
 
 
