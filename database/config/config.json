@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "root",
-    "password": "",
+    "username": "homeautomation",
+    "password": "password",
     "database": "automation",
     "host": "localhost",
     "dialect": "mysql",
