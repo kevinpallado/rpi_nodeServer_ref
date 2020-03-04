@@ -317,7 +317,7 @@ function add(event, data) {
                                         resolve(results);
                                     }
                                 });
-                            }, 9000);
+                            }, 1400);
                         } else {
                             resolve(results);
                         }
