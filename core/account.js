@@ -35,19 +35,18 @@ function view(event, data) {
                     }
                 })
                 break;
-            case "account-setting":
-                console.log("hello");
-                var sql_account_setting = "SELECT * FROM accounts WHERE  _id = '" + data.accountID + "'";
-                db.sql.query(sql_account_setting, (err, rows, results) => {
-                    console.log(rows);
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
-                        resolve(rows);
-                    }
-                })
-                break;
+            // case "account-setting":
+            //     var sql_account_setting = "SELECT * FROM accounts WHERE  _id = '" + data.accountID + "'";
+            //     db.sql.query(sql_account_setting, (err, rows, results) => {
+            //         console.log(rows);
+            //         if (err) {
+            //             reject(err);
+            //         }
+            //         else {
+            //             resolve(rows);
+            //         }
+            //     })
+            //     break;
             default:
                 break;
         }
@@ -60,7 +59,7 @@ function add(event, data) {
         switch (event) {
             case "add_account":
                 console.log("add");
-                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday,pin) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "','" + data.PIN + "')";
+                var sql_add = "INSERT INTO accounts (firstName, lastName, email, contactNumber, password, birthday,pin,question1,question2,answer1,answer2) VALUES ('" + data.firstName + "','" + data.lastName + "','" + data.email + "','" + data.contactNumber + "','" + data.password + "','" + data.birthday + "','" + data.PIN + "','" + data.question1 + "','" + data.question2 + "','" + data.answer1 + "','" + data.answer2 + "')";
                 db.sql.query(sql_add, (err, rows, results) => {
                     console.log(rows);
                     if (err) {

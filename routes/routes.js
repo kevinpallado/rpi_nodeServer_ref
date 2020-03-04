@@ -5,7 +5,6 @@ const express = require('express'),
 Device = require('../core/device');
 
 Router.post("/account/event/", async (req, res) => {
-    console.log("helt");
     switch (req.body.event) {
         case "login":
             var login = await Account.view(req.body.event, req.body);
@@ -24,12 +23,10 @@ Router.post("/account/event/", async (req, res) => {
         case "get-pin":
             var pin = await Account.view(req.body.event, req.body);
             res.send(pin);
-        case "account-setting":
-            console.log("heltaa");
-
-            var account_setting = await Account.view(req.body.event, req.body);
-            res.send(account_setting);
-            break
+        // case "account-setting":
+        //     var account_setting = await Account.view(req.body.event, req.body);
+        //     res.send(account_setting);
+        //     break;
         default:
             break;
     }
@@ -84,6 +81,9 @@ Router.post("/devices/event", async (req, res) => {
             var registered = await Device.add(req.body.event, req.body);
             res.send(registered);
             break;
+        case "view-history-device":
+            var history = await Device.view(req.body.event, req.body);
+            res.send(history);
         default:
             break;
     }

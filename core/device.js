@@ -144,7 +144,7 @@ function view(event, data) {
                     if (err) { reject(err); }
                     else { resolve(rows); }
                 });
-
+                break;
             case "registered-devices":
                 var sql_designation = "SELECT rd._id, rd.application, rd.deviceLists, rd.area, rd.macAddress, rd.state, acc.firstName, acc.lastName FROM registered_devices as rd LEFT JOIN accounts as acc ON rd.accountID = acc._id WHERE acc._id = '" + data.accountid + "'";
                 var reg_dlists = [];
@@ -166,6 +166,16 @@ function view(event, data) {
                         resolve(reg_dlists);
                     }
                 });
+                break;
+            case "view-history-device":
+
+                var history = "SELECT * from history,registered_devices where history.register_id = registered_devices._id AND registered_devices.accountID ='" + data.accountID + "' order by history.created desc";
+                db.sql.query(history, (err, rows, results) => {
+                    if (err) { reject(err); }
+                    else {
+                        resolve(rows);
+                    }
+                });
             default:
                 break;
         }
@@ -178,7 +188,11 @@ function add(event, data) {
 
         switch (event) {
             case "register-devices":
-                var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID,pin) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 0 + "','" + data.accountID + "','" + data.pin + "')";
+                if (data.appliances == 'Window') {
+                    var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID,pin) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 1 + "','" + data.accountID + "','" + data.pin + "')";
+                } else {
+                    var sql_register_device = "INSERT INTO registered_devices (application, deviceLists, area, macAddress, state, accountID,pin) VALUES ('" + data.appliances + "','" + data.deviceList + "','" + data.area + "','" + data.macAddress + "','" + 0 + "','" + data.accountID + "','" + data.pin + "')";
+                }
                 db.sql.query(sql_register_device, (err, rows, results) => {
                     if (err) {
                         reject(err);
@@ -277,7 +291,6 @@ function add(event, data) {
                 break;
             case "door-toogle-device":
                 var new_device_state = '';
-                console.log("Hello");
                 data.state == 0 ? new_device_state = 1 : new_device_state = 0;
                 var sql_toogle = "UPDATE registered_devices SET state = '" + new_device_state + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                 db.sql.query(sql_toogle, (err, rows, results) => {
@@ -287,6 +300,13 @@ function add(event, data) {
                     else {
                         if (new_device_state == 1) {
                             //toogle(new_device_status, data);
+                            var sql_history = "INSERT INTO history (register_id, state) VALUES ('" + data.registered_device_id + "','" + new_device_state + "')";
+                            db.sql.query(sql_history, (err, rows, results) => {
+                                if (err) {
+                                    reject(err);
+                                }
+
+                            });
                             setTimeout(function () {
                                 var sql_toogle = "UPDATE registered_devices SET state = '" + 0 + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                                 db.sql.query(sql_toogle, (err, rows, results) => {
@@ -311,10 +331,10 @@ function add(event, data) {
                         reject(err);
                     }
                     else {
-
                         resolve(rows);
                     }
                 });
+
             default:
                 break;
         }
