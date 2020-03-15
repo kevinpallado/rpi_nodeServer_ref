@@ -246,51 +246,15 @@ function add(event, data) {
                         //         console.log(rows);
                         //     }
                         // });
-                        // var sendNotification = function (data) {
-                        //     var headers = {
-                        //         "Content-Type": "application/json; charset=utf-8",
-                        //         "Authorization": "Basic NGUzOGM5ZTMtYWNiYS00YjVmLTlkMjUtNWEyNjgzYWE4Y2I2"
-                        //     };
 
-                        //     var options = {
-                        //         host: "onesignal.com",
-                        //         port: 443,
-                        //         path: "/api/v1/notifications",
-                        //         method: "POST",
-                        //         headers: headers
-                        //     };
-
-                        //     var https = require('https');
-                        //     var req = https.request(options, function (res) {
-                        //         res.on('data', function (data) {
-                        //             console.log("Response:");
-                        //             console.log(JSON.parse(data));
-                        //         });
-                        //     });
-
-                        //     req.on('error', function (e) {
-                        //         console.log("ERROR:");
-                        //         console.log(e);
-                        //     });
-
-                        //     req.write(JSON.stringify(data));
-                        //     req.end();
-                        // };
-
-                        // var message = {
-                        //     app_id: "2512695d-9642-462f-ad9e-cc4b3c1109bf",
-                        //     contents: { "en": "English Message" },
-                        //     included_segments: ["All"]
-                        // };
-                        // console.log("SEnd Notif");
-                        // sendNotification(message);
-                        //console.log(message);
                         resolve(results);
                     }
                 });
                 break;
             case "door-toogle-device":
                 var new_device_state = '';
+                // console.log(data.playerid);
+                console.log(data.playerid);
                 data.state == 0 ? new_device_state = 1 : new_device_state = 0;
                 var sql_toogle = "UPDATE registered_devices SET state = '" + new_device_state + "'WHERE registered_devices._id = '" + data.registered_device_id + "'";
                 db.sql.query(sql_toogle, (err, rows, results) => {
@@ -314,6 +278,47 @@ function add(event, data) {
                                         reject(err);
                                     }
                                     else {
+                                        var sendNotification = function (data) {
+                                            var headers = {
+                                                "Content-Type": "application/json; charset=utf-8",
+                                                "Authorization": "Basic NGUzOGM5ZTMtYWNiYS00YjVmLTlkMjUtNWEyNjgzYWE4Y2I2"
+                                            };
+
+                                            var options = {
+                                                host: "onesignal.com",
+                                                port: 443,
+                                                path: "/api/v1/notifications",
+                                                method: "POST",
+                                                headers: headers
+                                            };
+
+                                            var https = require('https');
+                                            var req = https.request(options, function (res) {
+                                                res.on('data', function (data) {
+                                                    console.log("Response:");
+                                                    console.log(JSON.parse(data));
+                                                });
+                                            });
+
+                                            req.on('error', function (e) {
+                                                console.log("ERROR:");
+                                                console.log(e);
+                                            });
+
+                                            req.write(JSON.stringify(data));
+                                            req.end();
+                                        };
+
+                                        var message = {
+                                            app_id: "2512695d-9642-462f-ad9e-cc4b3c1109bf",
+                                            // included_segments: ["All"],
+                                            include_player_ids: [data.playerid],
+                                            "data": { "foo": "bar" },
+                                            contents: { "en": "Your Door has been Open" },
+                                        };
+                                        console.log("SEnd Notif");
+                                        sendNotification(message);
+                                        console.log(message);
                                         resolve(results);
                                     }
                                 });
@@ -372,6 +377,21 @@ function update(event, data) {
 
             case "device-designation":
 
+                break;
+            case "update-registered-device":
+                console.log("data.type");
+                console.log(data.type);
+                console.log(data.id);
+                console.log("data.type");
+                var update_device_registered = "UPDATE registered_devices SET application = '" + data.type + "',deviceLists = '" + data.deviceLists + "' WHERE registered_devices._id = '" + data.id + "'";
+                db.sql.query(update_device_registered, (err, rows, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(rows);
+                    }
+                });
                 break;
         }
     });

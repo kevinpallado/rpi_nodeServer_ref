@@ -1,5 +1,6 @@
 const db = require('../connection');
-
+var LocalStorage = require('node-localstorage').LocalStorage,
+    localStorage = new LocalStorage('./scratch');
 function view(event, data) {
     return new Promise((resolve, reject) => {
         console.log("event => " + event);
@@ -18,6 +19,7 @@ function view(event, data) {
                         reject(err);
                     }
                     else {
+                        console.log(localStorage.setItem('playerID', data.player_id));
                         resolve(rows);
                     }
                 })

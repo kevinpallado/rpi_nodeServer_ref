@@ -84,6 +84,10 @@ Router.post("/devices/event", async (req, res) => {
         case "view-history-device":
             var history = await Device.view(req.body.event, req.body);
             res.send(history);
+        case "update-registered-device":
+            var update_device = await Device.update(req.body.event, req.body);
+            res.send(update_device);
+            break;
         default:
             break;
     }

@@ -10,7 +10,8 @@ const express = require('express'),
     file = new static.Server('./'),
     app = express();
 const db = require('./connection');
-
+var LocalStorage = require('node-localstorage').LocalStorage,
+    localStorage = new LocalStorage('./scratch');
 let https = require('http').Server(app);
 let io = require('socket.io')(https);
 
@@ -56,21 +57,17 @@ db.sql.query(sql_view, (err, rows, results) => {
         });
     }
 });
+
 app.post('/data-receiver', async (req, res) => {
-    //console.log(req.body);
     for (var i = 0; i < devices.length; i++) {
 
         if (devices[i] == req.body['macAddress']) {
             consumption.push(req.body);
         }
-
         if (req.body['device'] == 'Window') {
             if (devices[i] == req.body['macAddress']) {
-
-                console.log(req.body);
                 window.push(req.body);
             } else {
-
             }
 
         }
@@ -119,37 +116,38 @@ io.sockets.on('connection', function (socket, soc) {
     sendData(socket);
     windowData(socket);
 })
-
-// let number = 0;
-
-// function window(socket) {
-//     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
-//     if (result == '') {
-
-//     } else {
-//         for (var i = 0; i <= result.length; i++) {
-//             if (result[i].device == 'Door') {
-//                 console.log("has Data");
-//             } else {
-//                 console.log("No Data");
-//             }
-//         }
-//     }
-// }
-
-
+var co = 0;
+localStorage.setItem('timer', '0');
 function windowData(socket) {
     result = [...new Map(window.map(x => [x.macAddress, x])).values()]
+    var player_id = localStorage.getItem('playerID');
     if (result == '') {
-
     } else {
-        // console.log(result);
         for (var i = 0; i <= result.length; i++) {
-
             if (result[i]) {
                 if (result[i] == undefined) {
                     console.log("undefined");
                 } else {
+                    if (result[i].state == 0) {
+                        console.log("timerrrrrrrrrrrrrrrrrrrr");
+                        WindowNofication(player_id);
+
+                        if (localStorage.getItem('timer') == 1) {
+                            if (co >= 3600000) {
+                                console.log("Hello Reset");
+                                localStorage.setItem('timer', '0');
+                                WindowNofication(player_id);
+                                co = 0;
+                            } else {
+                            }
+                            console.log("done");
+                        } else {
+
+                        }
+
+                    } else {
+
+                    }
                     socket.emit('window', {
                         macAddress: result[i].macAddress,
                         deviceID: result[i].deviceID,
@@ -157,19 +155,75 @@ function windowData(socket) {
                     });
                 }
             }
-
         }
     }
     setTimeout(() => {
         windowData(socket);
-
+        co++;
+        console.log(co);
+        if (co >= 35) {
+            co = 0;
+        }
     }, 2000);
 }
+
+function WindowNofication(player_id) {
+    if (player_id == null) {
+    } else {
+        if (localStorage.getItem('timer') == 0) {
+            var sendNotification = function (data) {
+                var headers = {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "Authorization": "Basic NGUzOGM5ZTMtYWNiYS00YjVmLTlkMjUtNWEyNjgzYWE4Y2I2"
+                };
+
+                var options = {
+                    host: "onesignal.com",
+                    port: 443,
+                    path: "/api/v1/notifications",
+                    method: "POST",
+                    headers: headers
+                };
+
+                var https = require('https');
+                var req = https.request(options, function (res) {
+                    res.on('data', function (data) {
+                        console.log("Response:");
+                        console.log(JSON.parse(data));
+                    });
+                });
+
+                req.on('error', function (e) {
+                    console.log("ERROR:");
+                    console.log(e);
+                });
+
+                req.write(JSON.stringify(data));
+                req.end();
+            };
+
+            var message = {
+                app_id: "2512695d-9642-462f-ad9e-cc4b3c1109bf",
+                // included_segments: ["All"],
+                include_player_ids: [player_id],
+                "data": { "foo": "bar" },
+                contents: { "en": "Your Window has been Open" },
+            };
+            console.log("SEnd Notif");
+            sendNotification(message);
+            console.log(message);
+            localStorage.setItem('timer', '1');
+        } else {
+
+        }
+    }
+}
+
+
 function sendData(socket) {
 
     result = [...new Map(consumption.map(x => [x.macAddress, x])).values()]
     if (result == '') {
-
 
     } else {
         for (var i = 0; i <= result.length; i++) {
