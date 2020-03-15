@@ -123,9 +123,7 @@ function view(event, data) {
                         dataResponse.length = 1;
                         resolve(dataResponse);
                     }
-                    else
-                    {
-                        dataResponse.length = 1;
+                    else {
                         resolve(dataResponse);
                     }
                 });
