@@ -10,7 +10,8 @@ function view(event, data) {
             state: 0,
             application: 0,
             count: 0,
-            init_setup: true
+            init_setup: true,
+            length: 0
         };
         switch (event) {
             case "check":
@@ -113,9 +114,18 @@ function view(event, data) {
                 db.sql.query(sql_state, (err, rows, results) => {
                     if (err) throw error;
                     if (rows.length > 0) {
-                        dataResponse.application = rows[0].application;
+                        dataResponse.accountid = rows[0].accountID;
+                        dataResponse.deviceid = rows[0]._id;
                         dataResponse.state = rows[0].state;
-                        dataResponse.init_setup = false;
+                        dataResponse.application = rows[0].application;
+                        dataResponse.password = rows[0].pin;
+                        // dataResponse.init_setup = false;
+                        dataResponse.length = 1;
+                        resolve(dataResponse);
+                    }
+                    else
+                    {
+                        dataResponse.length = 1;
                         resolve(dataResponse);
                     }
                 });
